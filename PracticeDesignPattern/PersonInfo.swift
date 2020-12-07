@@ -9,8 +9,17 @@ import Foundation
 
 // MARK: Model of MVC
 
+protocol InfoManagerDelegate {
+    func updatedInfos()
+}
+
 class InfoManager {
-    private var infos: [PersonInfo] = []
+    var delegate: InfoManagerDelegate?
+    private var infos = [PersonInfo]() {
+        didSet {
+            delegate?.updatedInfos()
+        }
+    }
     
     func getInfos() -> [PersonInfo] {
         return self.infos
@@ -22,12 +31,7 @@ class InfoManager {
     }
 }
 
-class PersonInfo {
-    var name: String = ""
-    var age: Int = 0
-    
-    init(name: String, age: Int) {
-        self.name = name
-        self.age = age
-    }
+struct PersonInfo {
+    var name: String
+    var age: Int
 }

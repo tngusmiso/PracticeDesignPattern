@@ -18,34 +18,64 @@ class ViewController: UIViewController {
     // MARK: - Controller -> Model
     let infoManager = InfoManager()
     
-    // MARK: -
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
         infoTableView.delegate = self
         infoTableView.dataSource = self
+        
+        infoManager.delegate = self
     }
 }
 
-// MARK: - View -> Controller (target action)
+// MARK: - Model -> Controller
+// MARK: [dlegate]
+extension ViewController: InfoManagerDelegate {
+    func updatedInfos() {
+        infoTableView.reloadData()
+    }
+}
+
+// MARK: - View -> Controller
+// MARK: [target action]
 extension ViewController  {
     @IBAction func touchAddButton(_ sender: Any) {
+        guard let newName = nameTextField.text,
+              let newAge = Int(ageTextField.text!) else {
+            return
+        }
+        // controller -> model
+        infoManager.addPersonInfo(name: newName, age: newAge)
         
+        // controller -> view
+        nameTextField.text = ""
+        ageTextField.text = ""
     }
 }
 
-// MARK: - View -> Controller (delegate)
+// MARK: [delegate]
 extension ViewController: UITableViewDelegate {
    
 }
 
-// MARK: - View -> Controller (delegate)
+// MARK: [data source]
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return infoManager.getInfos().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell()
+        // controller -> view
+        let cell = UITableViewCell(style: .value1, reuseIdentifier: "infoTableViewCell")
+        
+        // controller -> model
+        let info = infoManager.getInfos()[indexPath.row]
+        
+        // controller -> view
+        cell.textLabel?.text = info.name
+        cell.detailTextLabel?.text = String(info.age)
+        
+        return cell
     }
 }
+
